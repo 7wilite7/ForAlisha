@@ -102,7 +102,7 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
 @media (max-width: 560px) { .bubble::before { display: none; } }
 
 /* gifts */
-.gifts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; width: 100%; max-width: 340px; }
+.gifts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; width: 100%; max-width: 520px; }
 @media (max-width: 520px) { .gifts { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 320px; } }
 .gift { background: none; border: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 8px; }
 .gift canvas { width: min(96px, 22vw); height: auto; }
@@ -246,6 +246,7 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
   <section class="scene" id="gifts" hidden>
     <h2>Choose your gift</h2>
     <div class="gifts">
+      <button class="gift" data-go="envelopeScene" data-gift="letter"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">A letter</span></button>
       <button class="gift" data-go="photos" data-gift="photos"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">Us</span></button>
       <button class="gift" data-go="song" data-gift="song"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">Our song</span></button>
     </div>
@@ -325,7 +326,7 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
       <div class="ticks" id="ticks"></div>
     </div>
     <div class="row">
-      <button class="btn ghost" data-go="photos">See us again</button>
+      <button class="btn ghost" data-go="envelopeScene">Read the letter again</button>
       <button class="btn" data-go="question">One more question →</button>
     </div>
   </section>
@@ -366,7 +367,15 @@ const CONFIG = {
   speaker: "boy",                   // "girl" or "boy": who says hi on the first screen
   hello: "hi Alisha, i made something just for you ♥"
 };
-const LETTER = ``;  // his letter goes here
+const LETTER = `My queen,
+
+You really mean everything to me. You've got a special place in my heart that nobody else could ever take. The way you make me feel is different, and I wouldn't trade what we've got for nothing. I know I ain't perfect, but one thing you'll never have to question is how much I love you. Through the good days and the bad, I'm always gonna choose you. You're my peace, my happiness and my favourite person, all in one. I got you, and I love you always.
+
+From the day we started this, you've made everything feel lighter. You make the regular days feel special, from the late-night food runs to the little moments where we're just being us. When I'm with you, I don't have to pretend to be anything. I can just be me, and you love me anyway.
+
+I want to keep growing with you, keep making memories with you, and keep showing you every day that you made the right choice. Whatever comes our way, we'll face it together. You've got me, all of me, for as long as you'll have me.
+
+You're my queen, today and always. ♥`;
 const PHOTOS = [
   ["media/photo1.jpg", "birthday girl, and the prettiest one in the room"],
   ["media/photo2.jpg", "looks better on you than it ever did on Neymar"],
@@ -376,7 +385,9 @@ const PHOTOS = [
   ["media/photo5.jpg", "my queen, and I'm always right behind you"],
   ["media/clip2.mp4", "self-care day, courtesy of you"],
   ["media/photo6.jpg", "every meal tastes better across from you"],
-  ["media/photo7.jpg", "all the roses for my queen"]
+  ["media/photo7.jpg", "all the roses for my queen"],
+  ["media/photo8.jpg", "you, me, and the best hug in the world"],
+  ["media/clip3.mp4", "date night views, but you're the best one"]
 ];
 const TOGETHER_SINCE = new Date(2026, 2, 6);  // 6 March 2026, midnight local time
 const REASONS = [];
