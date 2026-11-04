@@ -249,6 +249,7 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
       <button class="gift" data-go="envelopeScene" data-gift="letter"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">A letter</span></button>
       <button class="gift" data-go="photos" data-gift="photos"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">Us</span></button>
       <button class="gift" data-go="song" data-gift="song"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">Our song</span></button>
+      <button class="gift" data-go="reasons" data-gift="reasons"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">Reasons</span></button>
     </div>
     <div class="small" id="giftHint">open them all</div>
     <button class="btn" data-go="finale" id="lastThing" hidden>One last thing →</button>
@@ -301,7 +302,7 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
 
   <!-- 7b. reasons -->
   <section class="scene" id="reasons" hidden>
-    <h2>Just a few quick reasons why I love you</h2>
+    <h2>20 reasons why I love you</h2>
     <div class="reasons px" id="reasonList"></div>
     <button class="btn ghost" data-go="gifts">← Back to gifts</button>
   </section>
@@ -387,10 +388,32 @@ const PHOTOS = [
   ["media/photo6.jpg", "every meal tastes better across from you"],
   ["media/photo7.jpg", "all the roses for my queen"],
   ["media/photo8.jpg", "you, me, and the best hug in the world"],
-  ["media/clip3.mp4", "date night views, but you're the best one"]
+  ["media/clip3.mp4", "date night views, but you're the best one"],
+  ["media/clip4.mp4", "scoring goals and stealing my heart"]
 ];
 const TOGETHER_SINCE = new Date(2026, 2, 6);  // 6 March 2026, midnight local time
-const REASONS = [];
+const REASONS = [
+  "I love the way you make me smile without even trying.",
+  "I love how you make me feel loved and wanted.",
+  "I love your smile and how it brightens up my day.",
+  "I love how I can be myself around you.",
+  "I love the way you care about me.",
+  "I love how you make even the smallest moments feel special.",
+  "I love your laugh and how it makes me happy.",
+  "I love how beautiful you are, even when you don't see it yourself.",
+  "I love the way you make me feel safe and comfortable.",
+  "I love how you always be on my mind, no matter what I'm doing.",
+  "I love your personality and all your little ways.",
+  "I love how talking to you can fix my whole mood.",
+  "I love how you make me wanna become a better man.",
+  "I love the way you understand me like nobody else does.",
+  "I love all your little attitudes, even when you get on my nerves.",
+  "I love how you make me feel like the luckiest boy alive.",
+  "I love how I never get bored of you, no matter how much we talk.",
+  "I love the way you make my heart feel different from anyone else.",
+  "I love how I can see a future with you and nobody else.",
+  "I love you because you're you, and I wouldn't change a single thing about you even if I could."
+];
 const REASONS_CLOSING = "";
 const STORY = [];
 /* -------------------------------- */
@@ -676,9 +699,11 @@ $("mute").onclick = () => {
     li.textContent = r; li.style.animationDelay = Math.min(i * 0.05, 1) + "s";
     ol.append(li);
   });
-  const end = document.createElement("li");  // the closing line is reason 100
-  end.className = "closing"; end.textContent = REASONS_CLOSING;
-  ol.append(end);
+  if (REASONS_CLOSING) {
+    const end = document.createElement("li");
+    end.className = "closing"; end.textContent = REASONS_CLOSING;
+    ol.append(end);
+  }
   $("reasonList").append(ol);
 }
 
