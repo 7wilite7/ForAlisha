@@ -197,9 +197,9 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
 /* polaroid wall */
 .wall { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; width: min(100%, 420px); }
 .wall figure { margin: 0; padding: 5px 5px 14px; background: var(--paper); box-shadow: 0 0 0 2px var(--ink), 4px 4px 0 rgba(74, 36, 83, .25);
-  transform: rotate(var(--r)); animation: drop .6s steps(6) both; }
+  position: relative; z-index: 0; }
 .wall img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: var(--blush); }
-@keyframes drop { from { transform: translateY(-110vh) rotate(calc(var(--r) * -4)); } to { transform: rotate(var(--r)); } }
+#yes h1 { position: relative; z-index: 2; }
 
 /* counter */
 .counter { padding: 14px 18px; display: flex; flex-direction: column; gap: 6px; }
@@ -938,10 +938,21 @@ function buildWall() {
   $("wall").innerHTML = "";
   pics.forEach((src, i) => {
     const f = document.createElement("figure"), im = document.createElement("img");
-    im.src = src; im.alt = ""; f.append(im);
-    f.style.setProperty("--r", [-5, 4, -2, 6, -4, 3][i % 6] + "deg");
-    f.style.animationDelay = 0.3 + i * 0.15 + "s";
-    $("wall").append(f);
+    const r = [-5, 4, -2, 6, -4, 3][i % 6];
+    f.style.transform = `rotate(${r}deg)`;
+    f.append(im); $("wall").append(f);
+    if (reduce) { im.src = src; return; }
+    f.style.visibility = "hidden";
+    const fall = () => {
+      f.style.visibility = "";
+      f.animate([
+        { transform: `translateY(-40px) scale(1.6) rotate(${-r * 3}deg)`, opacity: 0 },
+        { opacity: 1, offset: 0.3 },
+        { transform: `rotate(${r}deg)`, opacity: 1 }
+      ], { duration: 650, delay: 300 + i * 180, easing: "cubic-bezier(.3, 1.4, .55, 1)", fill: "backwards" });
+    };
+    im.onload = im.onerror = fall;
+    im.src = src;
   });
 }
 setInterval(() => { if (!$("finale").hidden) tick(); }, 1000);
