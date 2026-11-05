@@ -102,8 +102,9 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
 @media (max-width: 560px) { .bubble::before { display: none; } }
 
 /* gifts */
-.gifts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; width: 100%; max-width: 520px; }
-@media (max-width: 520px) { .gifts { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 320px; } }
+.gifts { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; width: 100%; max-width: 520px; }
+.gifts .gift { width: calc((100% - 36px) / 3); }
+@media (max-width: 520px) { .gifts { max-width: 320px; } .gifts .gift { width: calc((100% - 18px) / 2); } }
 .gift { background: none; border: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 8px; }
 .gift canvas { width: min(96px, 22vw); height: auto; }
 .gift:hover canvas { animation: wiggle .5s steps(4) infinite; }
@@ -181,10 +182,30 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
 .story img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; background: var(--blush); box-shadow: 0 0 0 3px var(--ink); }
 .story .forever { font-size: 30px; color: var(--rose); text-align: center; padding-top: 6px; }
 
+/* puzzle */
+.puzzle { position: relative; width: min(84vw, 330px); aspect-ratio: 1; padding: 0; background: var(--blush); }
+.puzzle .tile {
+  position: absolute; width: 33.334%; height: 33.334%; border: 0; padding: 0; cursor: pointer;
+  background-size: 300% 300%; box-shadow: inset 0 0 0 2px var(--ink);
+  transition: left .15s steps(3), top .15s steps(3), opacity .4s;
+}
+.puzzle .tile.blank { opacity: 0; pointer-events: none; }
+.puzzle.solved .tile { box-shadow: none; cursor: default; }
+.puzzle.solved .tile.blank { opacity: 1; }
+.puzzlemsg { min-height: 1.2em; font-size: 26px; color: var(--paper); text-shadow: 2px 2px 0 var(--ink); }
+
+/* polaroid wall */
+.wall { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; width: min(100%, 420px); }
+.wall figure { margin: 0; padding: 5px 5px 14px; background: var(--paper); box-shadow: 0 0 0 2px var(--ink), 4px 4px 0 rgba(74, 36, 83, .25);
+  transform: rotate(var(--r)); animation: drop .6s steps(6) both; }
+.wall img { display: block; width: 100%; aspect-ratio: 3 / 4; object-fit: cover; background: var(--blush); }
+@keyframes drop { from { transform: translateY(-110vh) rotate(calc(var(--r) * -4)); } to { transform: rotate(var(--r)); } }
+
 /* counter */
 .counter { padding: 14px 18px; display: flex; flex-direction: column; gap: 6px; }
 .counter .label { font-size: 12px; color: var(--rose); letter-spacing: .08em; }
 .ticks { font-size: 26px; font-variant-numeric: tabular-nums; }
+.counter .split { margin-top: 8px; padding-top: 10px; border-top: 3px dashed var(--pink); }
 
 /* question */
 #noBtn.runaway { position: fixed; z-index: 6; transition: left .15s steps(3), top .15s steps(3); }
@@ -250,6 +271,7 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
       <button class="gift" data-go="photos" data-gift="photos"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">Us</span></button>
       <button class="gift" data-go="song" data-gift="song"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">Our song</span></button>
       <button class="gift" data-go="reasons" data-gift="reasons"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">Reasons</span></button>
+      <button class="gift" data-go="puzzle" data-gift="puzzle"><canvas class="sprite" data-sprite="gift"></canvas><span class="label">Puzzle</span></button>
     </div>
     <div class="small" id="giftHint">open them all</div>
     <button class="btn" data-go="finale" id="lastThing" hidden>One last thing →</button>
@@ -307,6 +329,17 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
     <button class="btn ghost" data-go="gifts">← Back to gifts</button>
   </section>
 
+  <!-- 7c. puzzle -->
+  <section class="scene" id="puzzle" hidden>
+    <h2>Put us back<br>together</h2>
+    <div class="puzzle px" id="puzzleBoard"></div>
+    <div class="puzzlemsg" id="puzzleMsg"></div>
+    <div class="row">
+      <button class="btn ghost" id="puzzleShuffle">Shuffle</button>
+      <button class="btn ghost" data-go="gifts">← Back to gifts</button>
+    </div>
+  </section>
+
   <!-- 7d. our story -->
   <section class="scene" id="story" hidden>
     <h2>Our story</h2>
@@ -325,6 +358,8 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
     <div class="counter px">
       <div class="label">together since 6 March 2026</div>
       <div class="ticks" id="ticks"></div>
+      <div class="label split" id="annivLabel"></div>
+      <div class="ticks" id="anniv"></div>
     </div>
     <div class="row">
       <button class="btn ghost" data-go="envelopeScene">Read the letter again</button>
@@ -344,8 +379,8 @@ button:focus-visible { outline: 3px dashed var(--paper); outline-offset: 8px; }
 
   <!-- 10. yes -->
   <section class="scene" id="yes" hidden>
-    <div class="couple bob"><canvas class="sprite" data-sprite="girl" style="width:112px"></canvas><canvas class="sprite" data-sprite="boy" style="width:112px"></canvas></div>
     <h1>I knew it ♥</h1>
+    <div class="wall" id="wall"></div>
     <div class="final px">
       <p>Today, tomorrow, and every day after that.</p>
       <p class="big">I love you, Alisha ♥</p>
@@ -495,6 +530,8 @@ const REASONS = [
   "I love you because you're you, and that's all the reason I need. ♥"
 ];
 const REASONS_CLOSING = "";
+const PUZZLE_PHOTO = "media/photo8.jpg";
+const PUZZLE_DONE = "perfect fit, just like us ♥";
 const STORY = [];
 /* -------------------------------- */
 
@@ -613,7 +650,8 @@ function go(id) {
   if (id === "verses") burst(10);
   if (id === "story") $("storyList").scrollTop = 0;
   if (id === "question") resetNo();
-  if (id === "yes") burst(50);
+  if (id === "yes") { buildWall(); burst(50); }
+  if (id === "puzzle") buildPuzzle();
   if (id !== "song" && playing) togglePlay();
   if (id !== "photos") stopClip();
   if (id === "gifts") {
@@ -809,13 +847,102 @@ $("mute").onclick = () => {
   $("storyList").style.setProperty("--heart", H_RED);
 }
 
-/* ---- together counter ---- */
-function tick() {
-  let s = Math.max(0, Math.floor((Date.now() - TOGETHER_SINCE) / 1000));
+/* ---- together counter + anniversary countdown ---- */
+function dhms(ms) {
+  let s = Math.max(0, Math.floor(ms / 1000));
   const d = Math.floor(s / 86400); s %= 86400;
   const h = Math.floor(s / 3600); s %= 3600;
   const m = Math.floor(s / 60); s %= 60;
-  $("ticks").textContent = `${d} days, ${h} hours, ${m} minutes, ${s} seconds`;
+  return `${d} days, ${h} hours, ${m} minutes, ${s} seconds`;
+}
+function tick() {
+  const now = new Date();
+  $("ticks").textContent = dhms(now - TOGETHER_SINCE);
+  let years = 1, next;
+  for (;;) {
+    next = new Date(TOGETHER_SINCE); next.setFullYear(TOGETHER_SINCE.getFullYear() + years);
+    const dayAfter = new Date(next); dayAfter.setDate(dayAfter.getDate() + 1);
+    if (now < next) break;
+    if (now < dayAfter) {  // it's the anniversary today
+      $("annivLabel").textContent = "today is our anniversary";
+      $("anniv").textContent = `Happy ${years} year${years > 1 ? "s" : ""}, my queen ♥`;
+      return;
+    }
+    years++;
+  }
+  $("annivLabel").textContent = `our ${years} year anniversary in`;
+  $("anniv").textContent = dhms(next - now);
+}
+
+/* ---- photo puzzle (3x3 slide) ---- */
+let puzzle = null;
+function buildPuzzle() {
+  if (puzzle) return;
+  puzzle = { pos: [], tiles: [] };
+  const board = $("puzzleBoard"), img = new Image();
+  img.onload = () => {
+    const side = Math.min(img.width, img.height), c = document.createElement("canvas");
+    c.width = c.height = 600;
+    c.getContext("2d").drawImage(img, (img.width - side) / 2, (img.height - side) * 0.4, side, side, 0, 0, 600, 600);
+    const url = c.toDataURL("image/jpeg", 0.85);
+    for (let i = 0; i < 9; i++) {
+      const t = document.createElement("button");
+      t.className = "tile" + (i === 8 ? " blank" : "");
+      t.setAttribute("aria-label", "puzzle piece");
+      t.style.backgroundImage = `url(${url})`;
+      t.style.backgroundPosition = `${(i % 3) * 50}% ${Math.floor(i / 3) * 50}%`;
+      t.onclick = () => slide(i);
+      board.append(t); puzzle.tiles.push(t);
+    }
+    shufflePuzzle();
+  };
+  img.src = PUZZLE_PHOTO;
+}
+function placeTiles() {
+  puzzle.tiles.forEach((t, i) => {
+    t.style.left = (puzzle.pos[i] % 3) * 33.333 + "%";
+    t.style.top = Math.floor(puzzle.pos[i] / 3) * 33.333 + "%";
+  });
+}
+const adjacent = (a, b) => Math.abs(a % 3 - b % 3) + Math.abs(Math.floor(a / 3) - Math.floor(b / 3)) === 1;
+function shufflePuzzle() {
+  puzzle.pos = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+  let prev = -1;
+  do {
+    for (let k = 0; k < 80; k++) {
+      const blank = puzzle.pos[8];
+      const opts = [...Array(8).keys()].filter(i => adjacent(puzzle.pos[i], blank) && i !== prev);
+      const i = opts[Math.floor(Math.random() * opts.length)];
+      [puzzle.pos[i], puzzle.pos[8]] = [blank, puzzle.pos[i]]; prev = i;
+    }
+  } while (puzzle.pos.every((p, i) => p === i));
+  puzzle.done = false;
+  $("puzzleBoard").classList.remove("solved");
+  $("puzzleMsg").textContent = "tap a piece next to the gap";
+  placeTiles();
+}
+function slide(i) {
+  if (puzzle.done || !adjacent(puzzle.pos[i], puzzle.pos[8])) return;
+  [puzzle.pos[i], puzzle.pos[8]] = [puzzle.pos[8], puzzle.pos[i]];
+  placeTiles();
+  if (puzzle.pos.every((p, k) => p === k)) {
+    puzzle.done = true;
+    setTimeout(() => { $("puzzleBoard").classList.add("solved"); $("puzzleMsg").textContent = PUZZLE_DONE; burst(24); }, 200);
+  }
+}
+$("puzzleShuffle").onclick = () => { if (puzzle && puzzle.tiles.length) shufflePuzzle(); };
+
+/* ---- polaroid wall on "yes" ---- */
+function buildWall() {
+  const pics = PHOTOS.map(([src]) => src.replace(".mp4", ".jpg"));
+  $("wall").innerHTML = "";
+  pics.forEach((src, i) => {
+    const f = document.createElement("figure"), im = document.createElement("img");
+    im.src = src; im.alt = ""; f.append(im);
+    f.style.setProperty("--r", [-5, 4, -2, 6, -4, 3][i % 6] + "deg");
+    f.style.animationDelay = 0.3 + i * 0.15 + "s";
+    $("wall").append(f);
+  });
 }
 setInterval(() => { if (!$("finale").hidden) tick(); }, 1000);
 
